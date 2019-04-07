@@ -1,0 +1,19 @@
+{
+  "name": "com.react-qml.breakpad",
+  "description": "Breakpad Integration for QML and ReactQML application",
+  "author": {
+    "name": "Long Nguyen",
+    "email": "long@podzim.co"
+  },
+  "repository": {
+    "type": "GIT",
+    "url": "git@github.com:longseespace/react-qml-breakpad.git"
+  },
+  "version": {
+    "label": "0.0.1"
+  },
+  "dependencies": [
+  ],
+  "license": "MIT",
+  "priFilename": "react-qml-breakpad.pri"
+}

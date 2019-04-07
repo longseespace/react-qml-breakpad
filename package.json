@@ -1,0 +1,9 @@
+{
+  "name": "@react-qml/breakpad",
+  "version": "0.0.1",
+  "description": "Breakpad Integration for QML and ReactQML application",
+  "main": "index.js",
+  "repository": "git@github.com:longseespace/react-qml-breakpad.git",
+  "author": "Long Nguyen <long@podzim.co>",
+  "license": "MIT"
+}
