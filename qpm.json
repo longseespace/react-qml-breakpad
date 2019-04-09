@@ -14,6 +14,6 @@
   },
   "dependencies": [
   ],
-  "license": "MIT",
+  "license": "LGPL_3_1",
   "priFilename": "react-qml-breakpad.pri"
 }
