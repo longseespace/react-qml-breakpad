@@ -1,8 +1,8 @@
 export type RQCrashHandlerOptions = {
+  submitURL: string;
   productName?: string;
   companyName?: string;
-  submitURL: string;
-  uploadToServer: boolean;
+  uploadToServer?: boolean;
   extra?: object;
 };
 

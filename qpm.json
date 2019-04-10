@@ -10,7 +10,7 @@
     "url": "git@github.com:longseespace/react-qml-breakpad.git"
   },
   "version": {
-    "label": "0.0.1"
+    "label": "0.1.0"
   },
   "dependencies": [
   ],
