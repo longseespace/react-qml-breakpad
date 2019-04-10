@@ -1,7 +1,8 @@
 QT *= core qml quick
 
-include(qt-breakpad/qt-breakpad.pri)
+CONFIG += thread exceptions rtti stl
 
+include(qt-breakpad/qt-breakpad.pri)
 
 RESOURCES += \
     $$PWD/react-qml-breakpad.qrc

@@ -156,6 +156,10 @@ NSString* GetPlatform() {
   });
 }
 
+- (BOOL)isStarted {
+  return started_;
+}
+
 // This method must be called from the breakpad queue.
 - (void)threadUnsafeSendReportWithConfiguration:(NSDictionary*)configuration
                                 withBreakpadRef:(BreakpadRef)ref {
@@ -249,10 +253,8 @@ NSString* GetPlatform() {
 }
 
 - (void)withBreakpadRef:(void(^)(BreakpadRef))callback {
-  NSAssert(started_,
-      @"The controller must be started before withBreakpadRef is called");
   dispatch_async(queue_, ^{
-      callback(breakpadRef_);
+      callback(started_ ? breakpadRef_ : NULL);
   });
 }
 
@@ -288,6 +290,18 @@ NSString* GetPlatform() {
       }
       [self reportWillBeSent];
       callback(BreakpadGetNextReportConfiguration(breakpadRef_), 0);
+  });
+}
+
+- (void)getDateOfMostRecentCrashReport:(void(^)(NSDate *))callback {
+  NSAssert(started_, @"The controller must be started before "
+           "getDateOfMostRecentCrashReport is called");
+  dispatch_async(queue_, ^{
+    if (!breakpadRef_) {
+      callback(nil);
+      return;
+    }
+    callback(BreakpadGetDateOfMostRecentCrashReport(breakpadRef_));
   });
 }
 

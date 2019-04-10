@@ -19,75 +19,75 @@
 #include "vendor/breakpad/src/client/linux/handler/minidump_descriptor.h"
 #elif defined(Q_OS_MAC)
 #include "vendor/breakpad/src/client/mac/handler/exception_handler.h"
+#include "vendor/breakpad/src/client/mac/handler/protected_memory_allocator.h"
 #endif // OS-specific includes
 
-class QtBreakpad
-{
+class QtBreakpad {
 public:
-    static void init(const QString& reportPath,
-                     google_breakpad::ExceptionHandler::FilterCallback filterCallBack = NULL,
-                     google_breakpad::ExceptionHandler::MinidumpCallback minidumpCallback = NULL,
-                     void* callbackContext = NULL);
+  static void
+  init(const QString &reportPath,
+       google_breakpad::ExceptionHandler::FilterCallback filterCallBack = NULL,
+       google_breakpad::ExceptionHandler::MinidumpCallback minidumpCallback =
+           NULL,
+       void *callbackContext = NULL);
 
-    typedef bool (*QMinidumpCallback)(QFile& minidumpFile, void* context);
+  typedef bool (*QMinidumpCallback)(QFile &minidumpFile, void *context);
 
-    static void init(const QString& reportPath,
-                     QMinidumpCallback qMinidumpCallback,
-                     void* callbackContext = NULL);
+  static void init(const QString &reportPath,
+                   QMinidumpCallback qMinidumpCallback,
+                   void *callbackContext = NULL);
 
 private:
-    Q_DISABLE_COPY(QtBreakpad)
-    static QtBreakpad* _instance;
-    static void replaceInstance(QtBreakpad* newInstance);
+  Q_DISABLE_COPY(QtBreakpad)
+  static QtBreakpad *_instance;
+  static void replaceInstance(QtBreakpad *newInstance);
 
-    class QMinidumpContextWrapper
-    {
-        public:
-            QMinidumpContextWrapper(QMinidumpCallback qMinicudmpCallback, void* context)
-            {
-                this->qMinicudmpCallback = qMinicudmpCallback;
-                this->context = context;
-            }
+  class QMinidumpContextWrapper {
+  public:
+    QMinidumpContextWrapper(QMinidumpCallback qMinicudmpCallback,
+                            void *context) {
+      this->qMinicudmpCallback = qMinicudmpCallback;
+      this->context = context;
+    }
 
-            ~QMinidumpContextWrapper() { }
+    ~QMinidumpContextWrapper() {}
 
-            QMinidumpCallback qMinicudmpCallback;
-            void* context;
-    };
+    QMinidumpCallback qMinicudmpCallback;
+    void *context;
+  };
 
-    QtBreakpad(const QString& reportPath,
-               google_breakpad::ExceptionHandler::FilterCallback filterCallBack,
-               google_breakpad::ExceptionHandler::MinidumpCallback minidumpCallback,
-               void* callbackContext);
-    QtBreakpad(const QString& reportPath,
-               QMinidumpCallback qMinidumpCallback,
-               void* callbackContext);
-    ~QtBreakpad();
+  QtBreakpad(
+      const QString &reportPath,
+      google_breakpad::ExceptionHandler::FilterCallback filterCallBack,
+      google_breakpad::ExceptionHandler::MinidumpCallback minidumpCallback,
+      void *callbackContext);
+  QtBreakpad(const QString &reportPath, QMinidumpCallback qMinidumpCallback,
+             void *callbackContext);
+  ~QtBreakpad();
 
-    google_breakpad::ExceptionHandler* _breakpad_handler;
-    void buildBreakpadHandler(const QString& reportPath,
-                              google_breakpad::ExceptionHandler::FilterCallback filterCallBack,
-                              google_breakpad::ExceptionHandler::MinidumpCallback minidumpCallback,
-                              void* callbackContext);
+  google_breakpad::ExceptionHandler *_breakpad_handler;
+  void buildBreakpadHandler(
+      const QString &reportPath,
+      google_breakpad::ExceptionHandler::FilterCallback filterCallBack,
+      google_breakpad::ExceptionHandler::MinidumpCallback minidumpCallback,
+      void *callbackContext);
 
-    QMinidumpContextWrapper* _qMinidumpContextWrapper;
+  QMinidumpContextWrapper *_qMinidumpContextWrapper;
 #if defined(Q_OS_WIN32)
-    static bool qMinidumpWrapper(const wchar_t* dump_path,
-                                 const wchar_t* minidump_id,
-                                 QMinidumpContextWrapper* context,
-                                 EXCEPTION_POINTERS* exinfo,
-                                 MDRawAssertionInfo* assertion,
-                                 bool succeeded);
+  static bool qMinidumpWrapper(const wchar_t *dump_path,
+                               const wchar_t *minidump_id,
+                               QMinidumpContextWrapper *context,
+                               EXCEPTION_POINTERS *exinfo,
+                               MDRawAssertionInfo *assertion, bool succeeded);
 #elif defined(Q_OS_LINUX)
-    static bool qMinidumpWrapper(const google_breakpad::MinidumpDescriptor & descriptor,
-                                 QMinidumpContextWrapper* context,
-                                 bool succeeded);
+  static bool
+  qMinidumpWrapper(const google_breakpad::MinidumpDescriptor &descriptor,
+                   QMinidumpContextWrapper *context, bool succeeded);
 
 #elif defined(Q_OS_MAC)
-    static bool qMinidumpWrapper(const char *dump_dir,
-                                      const char *minidump_id,
-                                      QMinidumpContextWrapper* contextWrapper,
-                                      bool succeeded);
+  static bool qMinidumpWrapper(const char *dump_dir, const char *minidump_id,
+                               QMinidumpContextWrapper *contextWrapper,
+                               bool succeeded);
 #endif
 };
 

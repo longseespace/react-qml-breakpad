@@ -36,13 +36,14 @@
 #ifndef CLIENT_MAC_HANDLER_EXCEPTION_HANDLER_H__
 #define CLIENT_MAC_HANDLER_EXCEPTION_HANDLER_H__
 
-#include <mach/mach.h>
 #include <TargetConditionals.h>
+#include <mach/mach.h>
 
 #include <string>
 
 #include "client/mac/handler/ucontext_compat.h"
 #include "common/scoped_ptr.h"
+#include <thread>
 
 #if !TARGET_OS_IPHONE
 #include "client/mac/crash_generation/crash_generation_client.h"
@@ -65,16 +66,16 @@ enum HandlerThreadMessage {
 };
 
 class ExceptionHandler {
- public:
+public:
   // A callback function to run before Breakpad performs any substantial
   // processing of an exception.  A FilterCallback is called before writing
   // a minidump.  context is the parameter supplied by the user as
   // callback_context when the handler was created.
   //
   // If a FilterCallback returns true, Breakpad will continue processing,
-  // attempting to write a minidump.  If a FilterCallback returns false, Breakpad
-  // will immediately report the exception as unhandled without writing a
-  // minidump, allowing another handler the opportunity to handle it.
+  // attempting to write a minidump.  If a FilterCallback returns false,
+  // Breakpad will immediately report the exception as unhandled without writing
+  // a minidump, allowing another handler the opportunity to handle it.
   typedef bool (*FilterCallback)(void *context);
 
   // A callback function to run after the minidump has been written.
@@ -86,17 +87,15 @@ class ExceptionHandler {
   // Return false to allow any other exception handlers to process the
   // exception.
   typedef bool (*MinidumpCallback)(const char *dump_dir,
-                                   const char *minidump_id,
-                                   void *context, bool succeeded);
+                                   const char *minidump_id, void *context,
+                                   bool succeeded);
 
   // A callback function which will be called directly if an exception occurs.
   // This bypasses the minidump file writing and simply gives the client
   // the exception information.
-  typedef bool (*DirectCallback)( void *context,
-                                  int exception_type,
-                                  int exception_code,
-                                  int exception_subcode,
-                                  mach_port_t thread_name);
+  typedef bool (*DirectCallback)(void *context, int exception_type,
+                                 int exception_code, int exception_subcode,
+                                 mach_port_t thread_name);
 
   // Creates a new ExceptionHandler instance to handle writing minidumps.
   // Minidump files will be written to dump_path, and the optional callback
@@ -106,15 +105,13 @@ class ExceptionHandler {
   // be written when WriteMinidump is called.
   // If port_name is non-NULL, attempt to perform out-of-process dump generation
   // If port_name is NULL, in-process dump generation will be used.
-  ExceptionHandler(const string &dump_path,
-                   FilterCallback filter, MinidumpCallback callback,
-                   void *callback_context, bool install_handler,
-		   const char *port_name);
+  ExceptionHandler(const string &dump_path, FilterCallback filter,
+                   MinidumpCallback callback, void *callback_context,
+                   bool install_handler, const char *port_name);
 
   // A special constructor if we want to bypass minidump writing and
   // simply get a callback with the exception information.
-  ExceptionHandler(DirectCallback callback,
-                   void *callback_context,
+  ExceptionHandler(DirectCallback callback, void *callback_context,
                    bool install_handler);
 
   ~ExceptionHandler();
@@ -124,14 +121,12 @@ class ExceptionHandler {
   void set_dump_path(const string &dump_path) {
     dump_path_ = dump_path;
     dump_path_c_ = dump_path_.c_str();
-    UpdateNextID();  // Necessary to put dump_path_ in next_minidump_path_.
+    UpdateNextID(); // Necessary to put dump_path_ in next_minidump_path_.
   }
 
   // Writes a minidump immediately.  This can be used to capture the
   // execution state independently of a crash.  Returns true on success.
-  bool WriteMinidump() {
-    return WriteMinidump(false);
-  }
+  bool WriteMinidump() { return WriteMinidump(false); }
 
   bool WriteMinidump(bool write_exception_stream);
 
@@ -144,16 +139,15 @@ class ExceptionHandler {
 
   static bool WriteMinidump(const string &dump_path,
                             bool write_exception_stream,
-                            MinidumpCallback callback,
-                            void *callback_context);
+                            MinidumpCallback callback, void *callback_context);
 
   // Write a minidump of child immediately. This can be used to capture
   // the execution state of a child process independently of a crash.
   static bool WriteMinidumpForChild(mach_port_t child,
-				    mach_port_t child_blamed_thread,
-				    const std::string &dump_path,
-				    MinidumpCallback callback,
-				    void *callback_context);
+                                    mach_port_t child_blamed_thread,
+                                    const std::string &dump_path,
+                                    MinidumpCallback callback,
+                                    void *callback_context);
 
   // Returns whether out-of-process dump generation is used or not.
   bool IsOutOfProcess() const {
@@ -164,7 +158,7 @@ class ExceptionHandler {
 #endif
   }
 
- private:
+private:
   // Install the mach exception handler
   bool InstallHandler();
 
@@ -186,8 +180,7 @@ class ExceptionHandler {
   // All minidump writing goes through this one routine.
   // |task_context| can be NULL. If not, it will be used to retrieve the
   // context of the current thread, instead of using |thread_get_state|.
-  bool WriteMinidumpWithException(int exception_type,
-                                  int exception_code,
+  bool WriteMinidumpWithException(int exception_type, int exception_code,
                                   int exception_subcode,
                                   breakpad_ucontext_t *task_context,
                                   mach_port_t thread_name,
@@ -199,7 +192,7 @@ class ExceptionHandler {
   static void *WaitForMessage(void *exception_handler_class);
 
   // Signal handler for SIGABRT.
-  static void SignalHandler(int sig, siginfo_t* info, void* uc);
+  static void SignalHandler(int sig, siginfo_t *info, void *uc);
 
   // disallow copy ctor and operator=
   explicit ExceptionHandler(const ExceptionHandler &);
@@ -276,6 +269,6 @@ class ExceptionHandler {
 #endif
 };
 
-}  // namespace google_breakpad
+} // namespace google_breakpad
 
-#endif  // CLIENT_MAC_HANDLER_EXCEPTION_HANDLER_H__
+#endif // CLIENT_MAC_HANDLER_EXCEPTION_HANDLER_H__

@@ -4,7 +4,7 @@ SOURCES += $$PWD/qt_breakpad.cpp
 INCLUDEPATH += $$PWD
 INCLUDEPATH += $$PWD/vendor/breakpad/src
 
-# Windows
+# windows
 win32:HEADERS += $$PWD/vendor/breakpad/src/common/windows/string_utils-inl.h
 win32:HEADERS += $$PWD/vendor/breakpad/src/common/windows/guid_string.h
 win32:HEADERS += $$PWD/vendor/breakpad/src/client/windows/handler/exception_handler.h
@@ -18,8 +18,8 @@ win32:SOURCES += $$PWD/vendor/breakpad/src/common/windows/string_utils.cc
 win32:SOURCES += $$PWD/vendor/breakpad/src/common/windows/guid_string.cc
 win32:SOURCES += $$PWD/vendor/breakpad/src/client/windows/crash_generation/crash_generation_client.cc
 
-# Linux
-unix:!macx {
+# linux
+linux {
   HEADERS += $$PWD/vendor/breakpad/src/client/linux/minidump_writer/cpu_set.h
   HEADERS += $$PWD/vendor/breakpad/src/client/linux/minidump_writer/proc_cpuinfo_reader.h
   HEADERS += $$PWD/vendor/breakpad/src/client/linux/handler/exception_handler.h
@@ -77,14 +77,16 @@ unix:!macx {
   SOURCES += $$PWD/vendor/breakpad/src/common/convert_UTF.c
 }
 
+# macos
 macx {
   HEADERS += \
     $$PWD/vendor/breakpad/src/client/mac/handler/exception_handler.h \
     $$PWD/vendor/breakpad/src/common/using_std_string.h \
-    $$PWD/vendor/breakpad/src/common/memory.h \
+    $$PWD/vendor/breakpad/src/common/memory_allocator.h \
     $$PWD/vendor/breakpad/src/common/basictypes.h \
     $$PWD/vendor/breakpad/src/common/memory_range.h \
     $$PWD/vendor/breakpad/src/common/string_conversion.h \
+    $$PWD/vendor/breakpad/src/client/mac/handler/protected_memory_allocator.h \
     $$PWD/vendor/breakpad/src/common/convert_UTF.h \
     $$PWD/vendor/breakpad/src/common/md5.h \
     $$PWD/vendor/breakpad/src/google_breakpad/common/minidump_format.h \
@@ -115,6 +117,45 @@ macx {
 
   OBJECTIVE_SOURCES += \
     $$PWD/vendor/breakpad/src/common/mac/MachIPC.mm
+
+  LIBS += -framework Foundation
+}
+
+# ios
+ios {
+  HEADERS += \
+    $$PWD/vendor/breakpad/src/client/mac/handler/exception_handler.h \
+    $$PWD/vendor/breakpad/src/client/mac/handler/protected_memory_allocator.h \
+    $$PWD/vendor/breakpad/src/common/using_std_string.h \
+    $$PWD/vendor/breakpad/src/common/memory_allocator.h \
+    $$PWD/vendor/breakpad/src/common/basictypes.h \
+    $$PWD/vendor/breakpad/src/common/memory_range.h \
+    $$PWD/vendor/breakpad/src/common/string_conversion.h \
+    $$PWD/vendor/breakpad/src/common/convert_UTF.h \
+    $$PWD/vendor/breakpad/src/common/md5.h \
+    $$PWD/vendor/breakpad/src/google_breakpad/common/minidump_format.h \
+    $$PWD/vendor/breakpad/src/google_breakpad/common/minidump_size.h \
+    $$PWD/vendor/breakpad/src/google_breakpad/common/breakpad_types.h \
+    $$PWD/vendor/breakpad/src/common/scoped_ptr.h \
+    $$PWD/vendor/breakpad/src/client/minidump_file_writer-inl.h \
+    $$PWD/vendor/breakpad/src/client/minidump_file_writer.h
+
+  SOURCES +=  \
+    $$PWD/vendor/breakpad/src/client/minidump_file_writer.cc \
+    $$PWD/vendor/breakpad/src/client/mac/handler/exception_handler.cc \
+    $$PWD/vendor/breakpad/src/client/mac/handler/minidump_generator.cc \
+    $$PWD/vendor/breakpad/src/client/mac/handler/breakpad_nlist_64.cc \
+    $$PWD/vendor/breakpad/src/client/mac/handler/dynamic_images.cc \
+    $$PWD/vendor/breakpad/src/client/mac/handler/protected_memory_allocator.cc \
+    $$PWD/vendor/breakpad/src/common/mac/file_id.cc \
+    $$PWD/vendor/breakpad/src/common/mac/macho_id.cc \
+    $$PWD/vendor/breakpad/src/common/mac/macho_reader.cc \
+    $$PWD/vendor/breakpad/src/common/mac/macho_utilities.cc \
+    $$PWD/vendor/breakpad/src/common/mac/macho_walker.cc \
+    $$PWD/vendor/breakpad/src/common/mac/string_utilities.cc \
+    $$PWD/vendor/breakpad/src/common/string_conversion.cc \
+    $$PWD/vendor/breakpad/src/common/convert_UTF.c \
+    $$PWD/vendor/breakpad/src/common/md5.cc
 
   LIBS += -framework Foundation
 }

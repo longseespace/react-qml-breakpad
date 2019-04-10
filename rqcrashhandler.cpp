@@ -7,6 +7,15 @@
 #include <QUrl>
 #include <QtCore>
 
+namespace {
+#if defined(Q_OS_MACOS) || defined(Q_OS_LINUX) || defined(Q_OS_WIN32) ||       \
+    defined(Q_OS_IOS)
+const bool kSupported = true;
+#else
+const bool kSupported = false;
+#endif
+} // namespace
+
 // qml instance, singleton for qml
 QObject *RQCrashHandler::qmlInstance(QQmlEngine *engine,
                                      QJSEngine *scriptEngine) {
@@ -34,11 +43,15 @@ static bool qtBreakpadCallback(QFile &minidumpFile, void *context) {
   QString crashId = fileInfo.baseName();
   handler->writeCrashReport(crashId);
 
-  // restart and send dump
-  // https://stackoverflow.com/questions/5129788/how-to-restart-my-own-qt-application
+// restart and send dump
+// https://stackoverflow.com/questions/5129788/how-to-restart-my-own-qt-application
+#if defined(Q_OS_MACOS) || defined(Q_OS_LINUX) || defined(Q_OS_WIN32)
   auto programName = qApp->arguments()[0];
   auto args = qApp->arguments();
   QProcess::startDetached(programName, args);
+#else
+  qApp->quit();
+#endif
 
   return true;
 }
@@ -50,6 +63,11 @@ RQCrashHandler::RQCrashHandler()
       m_uploader(new QBreakpadHttpUploader()) {}
 
 void RQCrashHandler::init(const QVariantMap &options) {
+  if (!kSupported) {
+    qWarning() << "Unsupported platform";
+    return;
+  }
+
   m_productName =
       options.value("productName", qApp->applicationName()).toString();
   m_companyName =
