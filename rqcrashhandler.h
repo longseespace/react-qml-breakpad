@@ -30,6 +30,7 @@ public:
   Q_INVOKABLE QString getProductName() const;
   Q_INVOKABLE QString getCompanyName() const;
   Q_INVOKABLE bool getUploadToServer() const;
+  Q_INVOKABLE bool getAutoupload() const;
 
   Q_INVOKABLE void crash();
 
@@ -54,6 +55,7 @@ private:
   QString m_productName;
   QString m_companyName;
   bool m_uploadToServer;
+  bool m_autoupload;
   QVariantMap m_extra;
   QString m_crashDirPath;
   QSettings m_settings;

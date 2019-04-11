@@ -43,12 +43,25 @@ static bool qtBreakpadCallback(QFile &minidumpFile, void *context) {
   QString crashId = fileInfo.baseName();
   handler->writeCrashReport(crashId);
 
-// restart and send dump
-// https://stackoverflow.com/questions/5129788/how-to-restart-my-own-qt-application
 #if defined(Q_OS_MACOS) || defined(Q_OS_LINUX) || defined(Q_OS_WIN32)
-  auto programName = qApp->arguments()[0];
-  auto args = qApp->arguments();
-  QProcess::startDetached(programName, args);
+  // restart and send dump
+  // https://stackoverflow.com/questions/5129788/how-to-restart-my-own-qt-application
+  QCommandLineParser parser;
+  QCommandLineOption crashedOption("crashed");
+  parser.addOption(crashedOption);
+
+  parser.process(qApp->arguments());
+
+  // this is to prevent crash-loop
+  if (!parser.isSet("crashed")) {
+    auto programName = qApp->arguments()[0];
+    auto args = qApp->arguments();
+    args.push_back("--crashed");
+    QProcess::startDetached(programName, args);
+  } else {
+    qApp->quit();
+  }
+
 #else
   qApp->quit();
 #endif
@@ -59,8 +72,8 @@ static bool qtBreakpadCallback(QFile &minidumpFile, void *context) {
 // class impl
 RQCrashHandler::RQCrashHandler()
     : QObject(), m_submitURL(), m_productName(), m_companyName(),
-      m_uploadToServer(true), m_extra(), m_crashDirPath(), m_settings(),
-      m_uploader(new QBreakpadHttpUploader()) {}
+      m_uploadToServer(true), m_autoupload(true), m_extra(), m_crashDirPath(),
+      m_settings(), m_uploader(new QBreakpadHttpUploader()) {}
 
 void RQCrashHandler::init(const QVariantMap &options) {
   if (!kSupported) {
@@ -74,6 +87,7 @@ void RQCrashHandler::init(const QVariantMap &options) {
       options.value("companyName", qApp->organizationName()).toString();
   m_submitURL = QUrl::fromUserInput(options.value("submitURL").toString());
   m_uploadToServer = options.value("uploadToServer", true).toBool();
+  m_autoupload = options.value("autoupload", true).toBool();
 
   if (m_uploadToServer && !m_submitURL.isValid()) {
     qFatal("Invalid submitURL");
@@ -90,7 +104,7 @@ void RQCrashHandler::init(const QVariantMap &options) {
     qFatal(QString("Unable to create folder %1").arg(crash_dir_name).toUtf8());
   }
 
-  if (hasPendingUpload()) {
+  if (hasPendingUpload() && m_autoupload) {
     QString crashId = getLastCrashReport();
     sendCrashReport(crashId);
   }
@@ -234,6 +248,8 @@ QString RQCrashHandler::getProductName() const { return m_productName; }
 QString RQCrashHandler::getCompanyName() const { return m_companyName; }
 
 bool RQCrashHandler::getUploadToServer() const { return m_uploadToServer; }
+
+bool RQCrashHandler::getAutoupload() const { return m_autoupload; }
 
 // qml registration
 void registerRQCrashHandler() {

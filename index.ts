@@ -19,6 +19,7 @@ export interface RQCrashHandlerType {
   getProductName(): string;
   getCompanyName(): string;
   getUploadToServer(): boolean;
+  getAutoupload(): boolean;
   crash(): void;
 }
 
