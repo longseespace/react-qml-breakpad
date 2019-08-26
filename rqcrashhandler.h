@@ -32,6 +32,8 @@ public:
   Q_INVOKABLE bool getUploadToServer() const;
   Q_INVOKABLE bool getAutoupload() const;
 
+  Q_INVOKABLE bool isRestartedAfterCrash() const;
+
   Q_INVOKABLE void crash();
 
   void writeCrashReport(const QString &crashId);

@@ -3,6 +3,7 @@ export type RQCrashHandlerOptions = {
   productName?: string;
   companyName?: string;
   uploadToServer?: boolean;
+  autoupload?: boolean;
   extra?: object;
 };
 
@@ -21,6 +22,7 @@ export interface RQCrashHandlerType {
   getUploadToServer(): boolean;
   getAutoupload(): boolean;
   crash(): void;
+  isRestartedAfterCrash(): boolean;
 }
 
 declare const RQCrashHandler: RQCrashHandlerType;

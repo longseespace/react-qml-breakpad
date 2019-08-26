@@ -1,8 +1,11 @@
 {
   "name": "@react-qml/breakpad",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Breakpad Integration for QML and ReactQML application",
-  "files": ["index.js", "index.d.ts"],
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
   "main": "index.js",
   "scripts": {
     "build": "tsc -d -t ES5 index.ts",

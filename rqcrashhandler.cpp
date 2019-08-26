@@ -32,12 +32,12 @@ QObject *RQCrashHandler::qmlInstance(QQmlEngine *engine,
 static bool qtBreakpadCallback(QFile &minidumpFile, void *context) {
   RQCrashHandler *handler = (RQCrashHandler *)context;
 
-  QFileInfo fileInfo(minidumpFile);
-
   bool uploadToServer = handler->getUploadToServer();
   if (!uploadToServer) {
     return true;
   }
+
+  QFileInfo fileInfo(minidumpFile);
 
   // write dump extradata to disk
   QString crashId = fileInfo.baseName();
@@ -119,8 +119,7 @@ void RQCrashHandler::addExtraParameter(const QString &key,
 
 void RQCrashHandler::addExtraParameter(const QString &key,
                                        const QVariantMap &value) {
-  QJsonDocument doc = QJsonDocument::fromVariant(value);
-  m_extra.insert(key, doc.toJson());
+  m_extra.insert(key, value);
 }
 
 void RQCrashHandler::removeExtraParameter(const QString &key) {
@@ -168,6 +167,7 @@ bool RQCrashHandler::hasPendingUpload() const {
 bool RQCrashHandler::writeParametersToDisk(const QString &crashId) {
   QFile file(
       QDir::cleanPath(m_crashDirPath + QDir::separator() + crashId + ".json"));
+
   if (file.open(QFile::ReadWrite)) {
     QTextStream ts(&file);
     QJsonDocument doc = QJsonDocument::fromVariant(m_extra);
@@ -250,6 +250,16 @@ QString RQCrashHandler::getCompanyName() const { return m_companyName; }
 bool RQCrashHandler::getUploadToServer() const { return m_uploadToServer; }
 
 bool RQCrashHandler::getAutoupload() const { return m_autoupload; }
+
+bool RQCrashHandler::isRestartedAfterCrash() const {
+  QCommandLineParser parser;
+  QCommandLineOption crashedOption("crashed");
+  parser.addOption(crashedOption);
+
+  parser.process(qApp->arguments());
+
+  return parser.isSet("crashed");
+}
 
 // qml registration
 void registerRQCrashHandler() {
