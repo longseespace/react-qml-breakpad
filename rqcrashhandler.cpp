@@ -50,7 +50,7 @@ static bool qtBreakpadCallback(QFile &minidumpFile, void *context) {
   QCommandLineOption crashedOption("crashed");
   parser.addOption(crashedOption);
 
-  parser.process(qApp->arguments());
+  parser.parse(qApp->arguments());
 
   // this is to prevent crash-loop
   if (!parser.isSet("crashed")) {
@@ -256,7 +256,7 @@ bool RQCrashHandler::isRestartedAfterCrash() const {
   QCommandLineOption crashedOption("crashed");
   parser.addOption(crashedOption);
 
-  parser.process(qApp->arguments());
+  parser.parse(qApp->arguments());
 
   return parser.isSet("crashed");
 }
